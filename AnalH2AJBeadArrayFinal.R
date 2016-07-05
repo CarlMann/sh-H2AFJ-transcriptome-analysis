@@ -2,7 +2,7 @@
 ###      Install Bioconductor and required packages if necessary   ########
 ##########################################################################
 ## source("http://www.bioconductor.org/biocLite.R")
-## biocLite(c("GEOquery", "R.utils", "beadarray","limma", "sva", "qvalue", "illuminaHumanv4.db", "GO.db", "pheatmap", "gplots",
+## biocLite(c("beadarray","limma", "sva", "qvalue", "illuminaHumanv4.db", "GO.db", "pheatmap", "gplots",
 "dplyr", "data.table", "calibrate")) 
 
 
@@ -10,12 +10,12 @@
 ###      Read Illumina Bead Chip Array Data and Normalize     #############
 ##########################################################################
 
-# download 41 .idat files containing Illumina HT12v4 Bead Chip array data manually or with getGEOSuppFiles
-# Reviewer's link pre-publication: http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?token=mbehkgeyrhcbbgr&acc=GSE62701 (manual download)
-library("GEOquery")
-library("R.utils")
- getGEOSuppFiles("GSE62701", makeDirectory = TRUE, baseDir = getwd()) # download .gz compressed data files in directory named 
-                                                                # "GSE62701" in the working directory;
+# download GSE62701_RAW.tar from the Supplementary files of GSE62701 in GEO:
+# http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE62701
+# unpacking the .tar file should give 41 idat.gz files GSM1531691 to GSM1531731
+# containing the raw Illumina HT12v4 Bead Chip array data. Transfer these files to
+# a folder labelled "GSE62701" in your R working directory.
+
 idatFiles <- list.files(path = file.path(getwd(),"GSE62701"), pattern = ".idat.gz", full.names=TRUE) 
 sapply(idatFiles, gunzip) # decompress the .gz compressed files
 
