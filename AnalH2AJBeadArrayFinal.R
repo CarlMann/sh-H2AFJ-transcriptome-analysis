@@ -332,7 +332,7 @@ topGOsensh2 # visualize the gene ontology classes that are most enriched in gene
 write.table(topGOsensh2,file="topGOsensh2.txt",quote=F,sep="\t",col.names=NA,row.names=TRUE) # write table for publication
 
 
-compare sensh2 and sensh3: #use data.table and dplyr functions to merge appropriate matrix data
+# compare sensh2 and sensh3: use data.table and dplyr functions to merge appropriate matrix data
         
 intersect(Downsensh2DE$ID, Downsensh3DE$ID) # 114 down-reg genes shared between the 2 sets
 intersect(sensh2DE$ID,sensh3DE$ID) #318 genes shared between the 2 sets
