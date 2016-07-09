@@ -3,7 +3,7 @@
 ##########################################################################
 ## source("http://www.bioconductor.org/biocLite.R")
 ## biocLite(c("beadarray","limma", "sva", "qvalue", "illuminaHumanv4.db", "GO.db", "pheatmap", "gplots",
-"dplyr", "data.table", "calibrate")) 
+## "dplyr", "data.table", "calibrate")) 
 
 
 ###########################################################################
