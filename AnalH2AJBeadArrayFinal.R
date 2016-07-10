@@ -660,6 +660,53 @@ heatmap.2(myDownJHMM, dendrogram="none", Rowv=FALSE, col = bluered(256), Colv=FA
           trace="none", cexRow=1, cexCol=1, symm=F,symkey=T,symbreaks=T, labRow=rownames(myDownJHMM), labCol=colnames(myDownJHMM),
           lhei = c(1,8), lwid = c(0.5,4))
 
+
+########################################################################################################################################################
+# Modify Volcano Plots for Fig. 4 of article
+########################################################################################################################################################
+# Making a Volcano Plot of genes differentially expressed in senescence versus proliferation with FDR<.01 for publication
+senProVP <- topTable(fit4, p.value=1, number=Inf, genelist=fData(svadat)$SYMBOL) # expression data for all genes for Volcano plot
+senProVP <- senProVP[!duplicated(senProVP$ID),] # 19,623 unique genes after eliminating duplicate probes
+shJDownids  <- rownames(senProVP) %in% rownames(sDownSenJ) # index vector identifying the Illumina probe IDs of the 71 genes that are upreg >2x in SEN and downreg by shJ
+sigcol2 <- senProVP$adj.P.Val<.01 #index vector for assigning red color to DE genes with FDR<.01
+cols <- ifelse(sigcol2, "red", "black")
+par(mar=c(5.1, 5.1, 2.1, 2.1)) # set graph margins to increase space on left and decrease space top and right relative to default
+plot(senProVP$logFC, -log10(senProVP$P.Val),cex=1, pch=16, xlim=c(-10,10), ylim=c(0,20), xlab="log2 (Fold Change)", ylab="-log10 (p-value)",
+     cex.lab=2, col=cols, cex.axis=2) # make volcano plot: log2(Fold Change) on x axis versus -log10 (p-value) on y axis
+points (senProVP[shJDownids,2], -log10(senProVP[shJDownids,5]),cex=1, pch=16, col="blue") # superpose blue points representing the SenUp+shJDown genes
+
+# Volcano plot genes differentially affected by sh-H2AFJ
+senshVP <- senshVP[!duplicated(senshVP$ID),] # 19,623 unique genes after eliminating duplicate probes
+h2afj <- senshVP[2,] # values for H2AFJ
+sigcol <- senshVP$qValue<.05 #index vector for assigning red color to DE genes with FDR<.05
+shJDownids2  <- rownames(senshVP) %in% rownames(sDownSenJ) # index vector identifying the Illumina probe IDs of the 71 genes that are upreg >2x in SEN and downreg by shJ
+cols <- ifelse(senshVP$ID=='H2AFJ', "blue", ifelse(sigcol, "red", "black"))
+par(mar=c(5.1, 5.1, 2.1, 2.1)) # set graph margins to increase space on left and decrease space top and right relative to default
+plot(senshVP$logFC, -log10(senshVP$P.Val),cex=1, pch=16, xlim=c(-3,3), xlab="log2 (Fold Change)", ylab="-log10 (p-value)",
+     cex.lab=2, col=cols, cex.axis=2) # make volcano plot: log2(Fold Change) on x axis versus -log10 (p-value) on y axis
+points (senshVP[shJDownids2,2], -log10(senshVP[shJDownids2,5]),cex=1, pch=16, col="blue") #add points corresponding to 71 genes upreg in SEN 2x
+text((senshVP[2,2]+1),-log10(senshVP[2,5]), labels='H2AFJ', col="blue", cex=2) # add 'H2AFJ' label next to its data point
+
+# Making a Volcano Plot of genes differentially expressed by overexpression of H2AFJ in proliferating cells with FDR<.01 for Volcano plot
+sigcol3 <- Rsh2Pro$adj.P.Val<.01 #index vector for assigning red color to DE genes with FDR<.01
+cols <- ifelse(sigcol3, "red", "black")
+par(mar=c(5.1, 5.1, 2.1, 2.1)) # set graph margins to increase space on left and decrease space top and right relative to default
+plot(Rsh2Pro$logFC, -log10(Rsh2Pro$P.Val),cex=1, pch=16, xlim=c(-6,6), ylim=c(0,20), xlab="log2 (Fold Change)", ylab="-log10 (p-value)",
+     cex.lab=2, col=cols, cex.axis=2) # make volcano plot: log2(Fold Change) on x axis versus -log10 (p-value) on y axis
+
+ImmGenes <- c("ADA","ARHGDI","CFB","BPGM","BST2","C3","CAMK2D","RUNX1","CD34","CDKN2B","CSF2","CTSK","HBEGF","EDN1","EGR1","FGF2","FOXE1",
+              "FN1","FOS","FYN","IFI6","GEM","CXCL1","CXCL2","HLA-A","HLA-B","HLA-C","HLA-F","HLA-H","ICAM1","IFI27","IFI35","IFIT2","IFIT1","IFIT3","IFNB1",
+              "IL1A","IL1B","IL6","IL15","CXCL10","IRF1","IRF7","ISG20","MX1","MX2","MYC","NFKB2","NFKBIA","OAS1","OAS2","SERPINE1","PLSCR1","POU2F2","EIF2AK2",
+              "PSMB8","PSMB9","RELB","RORA","CCL2","CCL20","SLC7A2","SOD2","SP100","STAT1","STAT2","TAP1","TGFB2","TNFAIP3","TNFSF4","UBC","VCAM1","VEGFA",
+              "SCG2","HIST1H4H","HIST2H4A","IFITM1","OASL","STX11","IL32","UBE2L6","CD83","KLF4","LPXN","ISG15","DHRS2","LRRC17","IRF9","IFI44L","IRAK3",
+              "USP18","DDX58","CYFIP2","BCL11A","XAF1","DDX60","DEFB103B","ZC3HAV1","TRIB3","CXCL16","IFIH1","DHX58","ZC3H12A","PARP9","RSAD2","GBP5",
+              "BATF2","IL34","DEFB103A","HIST2H4B")  # DE genes in the GO:0002376 immune system process (see Extended Data file 2).
+ImmIDs <- UpRsh2Pro2DE$ID %in% ImmGenes
+points (UpRsh2Pro2DE[ImmIDs,2], -log10(UpRsh2Pro2DE[ImmIDs,5]),cex=1, pch=16, col="blue") # superpose blue points representing the Immune System Process genes
+#that are up-reg >2x upon H2AFJ over-expression in proliferating cells
+
+
+
 # sessionInfo()
 
 # R version 3.2.1 (2015-06-18)
