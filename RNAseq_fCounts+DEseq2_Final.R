@@ -106,7 +106,20 @@ write.csv(RNAseqDE, file = "RNAseqDE_fCounts+DESeq2.csv")
 DownRNAseq <- RNAseqDE[which(RNAseqDE$log2FoldChange<0),]
 RNAseqMat <- as.matrix(DownRNAseq$log2FoldChange)
 rownames(RNAseqMat) <- DownRNAseq$symbol
-pheatmap(RNAseqMat,scale='none',cluster_cols=F, cluster_rows=F,show_rownames = T,cellwidth = 30,cellheight = 19.5, col=brewer.pal(9,"YlOrRd"))
+pheatmap(RNAseqMat,scale='none',cluster_cols=F, cluster_rows=F,show_rownames = T,cellwidth = 30,cellheight = 19.5,
+         col=brewer.pal(9,"YlOrRd"))
+         
+# FKPM Table
+x <- DGEList(counts=fc$counts, genes=fc$annotation[,c("GeneID","Length")]) #create DGEList with Rsubread
+dim(x$counts)        	# 25,702 genes
+fkpmTable <- rpkm(fc$counts, fc$annotation$Length)
+fkpmTable <- fkpmTable[rowSums(fkpmTable)>1,] #14,574 genes with sum greater than 1 FKPM for all samples
+fkpmTable <- as.data.frame(fkpmTable) # convert to data frame so that gene symbol column can be added
+symbol <- mapIds(org.Hs.eg.db,keys=row.names(fkpmTable),column="SYMBOL",keytype="ENTREZID",multiVals="first") # get gene symbols 
+symbol <- as.vector(symbol) # convert to vector of gene symbols
+fkpmTable$Symbol <- symbol # create column of gene symbols
+fkpmTable <- fkpmTable[order(-fkpmTable$NTSen5),] # order by decreasing FKPM for NTSen5 sample
+write.csv(fkpmTable, file="sh2_shNT_SEN_RNAseq_FKPM.csv") # write table for publication
 
 # sessionInfo()
 # R version 3.2.2 (2015-08-14)
